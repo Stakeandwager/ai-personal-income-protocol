@@ -1,0 +1,1 @@
+prediction_id,created_at_utc,kickoff_utc,home_team,away_team,home_expected_goals,away_expected_goals,p_home,p_draw,p_away,predicted_outcome,actual_home_goals,actual_away_goals,actual_outcome,status,model_version,notes
