@@ -1,0 +1,46 @@
+
+name: APIP Scheduled Validation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apip-scheduled-validation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Run automated tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Validate income ledger and generate report
+        run: python scripts/run_protocol.py
+
+      - name: Commit and push report if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest-report.md
+          if git diff --cached --quiet; then
+            echo "Report unchanged; no commit needed."
+          else
+            git commit -m "chore: update scheduled protocol report"
+            git push
+          fi

@@ -1,0 +1,1 @@
+record_id,date_utc,experiment_id,event_type,status,currency,gross_amount,fees,refunds,other_costs,net_amount,amount_received,proof_url,notes
