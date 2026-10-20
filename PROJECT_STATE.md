@@ -20,6 +20,23 @@ AI Personal Income Protocol (APIP)
 
 No suitable real purchase, marketplace account, publishing channel, or outreach recipient was available, so no external commercial action was attempted. The addendum's NGN 10,000 cumulative authorization is recorded in `DECISIONS.md`; prior spend and remaining budget are not established, and the test-only database balances do not count as real spend.
 
+## Autonomous run — 2026-10-20 12:45 UTC
+
+- Acquired exclusive lease run ID `tSgHOA7SrQ-lrHv2f_ZnmocbjNTy-Km1`; lease retained through final checks and released afterward.
+- Focused engineering change: private-console plan status now projects from append-only outcome events; terminal user-reported outcomes cannot be overwritten; outcomes remain explicitly unverified. See `scripts/private_console.py` and its tests.
+- Market evidence: ranked, dated public listings and procurement notices recorded in `reports/current-paid-work-shortlist-2026-10-20.md`. Search results surfaced a US$20 Excel cleanup listing but its page returned 403 and had inconsistent date metadata. Current NipeX notice is a specialist diving tender; FAO agriculture notice and two other procurement opportunities were expired or beyond demonstrated qualifications.
+- Verification: focused console tests passed 12; full regression suite passed 50. One initial targeted test run exposed a test fixture ordering mismatch (console event reader presents newest first); corrected fixture and reran successfully.
+- No contact, publication, marketplace proposal, purchase, API use, or external delivery. Spend: NGN 0. Income ledger currently has zero records; no independent bank reconciliation, so historical spend balance and daily target attainment remain unestablished.
+- Next: reconcile cumulative APIP spend and connect/verify an eligible marketplace account before considering one zero-cash proposal. Observe an actual scheduled automation run separately; this manual run does not prove recurring scheduler execution.
+
+## Bounded workflow execution — 2026-10-20 13:41 UTC
+
+- Added and pushed workflow policy kernel at `d1cc981`; this follow-up wires it to the local private console planner. Live API plans now request typed action suggestions, which APIP classifies itself; offline demo mode remains advisory and does not invent action/evidence records.
+- The console can execute only local proposal-draft preparation. It writes a local Markdown artifact and append-only completion event with SHA-256 evidence. Missing owner experience stays a placeholder. Web citation annotations are retained with live plans when optional API web search is enabled.
+- Public-source execution, marketplace submission, purchases, contracts, and payment remain blocked or owner handoff due missing adapters. Paid API use is disabled by default. No API call, application, outreach, spend, or payment occurred in this run.
+- Verification: focused private-console suite passed 16 tests; full suite passed 62; Node syntax check passed. Vite production build had already passed during this milestone before the backend-only console integration.
+- Next: implement a permitted public-source executor with freshness/eligibility records, then connect an authorized marketplace account and ensure a one-off scoped approval occurs only immediately before a supported proposal submission. This remains short of the first commercial transaction.
+
 ## First income-sourcing experiment — 2026-10-20
 
 - Current discovery found five public Upwork buyer briefs. Strongest fit: spreadsheet/database cleanup, with a proposed US$10 fixed-price offer to clean up to 100 client-provided rows and return a cleaned CSV plus exceptions/QA notes within 24 hours. The source listing displayed 20–50 proposals, one hire, and a buyer profile with US$4.2K spend/269 hires/16 active. This signals a buyer request and platform activity; it does not establish APIP-specific demand or current listing availability.

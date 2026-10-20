@@ -34,7 +34,7 @@ The site is **not deployed** and this is not a validated commercial product. Bef
 
 ## Autonomous workflow foundation
 
-`scripts/apip_workflow.py` is the first typed execution-policy layer: it can create a local proposal draft with evidence, while public-source research and external applications are marked blocked until their integrations exist. Spend waits for an evidenced opening balance and explicit limit; legal and money-movement actions stay with the owner. The policy kernel is not yet connected to the private console planner. See `docs/APIP_AUTONOMOUS_WORKFLOW_V2.md`.
+`scripts/apip_workflow.py` is connected to the local private console planner: typed AI-suggested steps receive APIP-assigned policy states, and the console can execute a local proposal draft with evidence. Public-source lookups need the optional API search setting; marketplace submissions remain blocked until an account and adapter exist. Spend waits for an evidenced opening balance and explicit limit; legal and money-movement actions stay with the owner. See `docs/APIP_AUTONOMOUS_WORKFLOW_V2.md`.
 
 ## Financial truth
 A passing test means the software passed its checks. It does not mean income has been earned. Ledger figures are only as reliable as their evidence.

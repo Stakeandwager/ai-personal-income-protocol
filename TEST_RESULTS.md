@@ -39,3 +39,17 @@
 - Command: `python -m unittest discover -s tests -v`
 - Result: PASS — 47 tests.
 - This run changed project records, examples, and the existing Codex automation prompt; no executable source changed after this validation.
+
+## 2026-10-20 — private-console outcome lifecycle
+- Focused command: `python -m unittest discover -s tests -p test_private_console.py -v` — PASS, 12 tests.
+- Initial focused attempt: FAIL, 2 newly added assertions used oldest-first event fixtures while the console reader presents newest-first. Corrected fixtures to match the persisted-reader order; no product-code defect was found by that failure.
+- Full regression command: `python -m unittest discover -s tests -v` — PASS, 50 tests.
+- New coverage checks latest outcome projection, active-to-terminal transition rules, rejection of terminal overwrite, and append-only/unverified event recording.
+- Source evidence and income status: `reports/current-paid-work-shortlist-2026-10-20.md`. Search-only Upwork snippets were not treated as independently refreshed listings; no external action or spend occurred.
+
+## 2026-10-20 — bounded workflow execution
+- Focused workflow command: `python -m unittest discover -s tests -p test_apip_workflow.py -v` — PASS, 8 tests.
+- Focused console command: `python -m unittest discover -s tests -p test_private_console.py -v` — PASS, 16 tests.
+- Full regression command: `python -m unittest discover -s tests -v` — PASS, 62 tests.
+- `npm run check` passed. `npm run build` passed for this code milestone; the later console integration changed only Python and documentation files.
+- Coverage includes typed JSON plan parsing, citation capture, append-only snapshot projection, local-only draft execution with hash evidence, and fail-closed marketplace/spend/legal action policy. No paid API request, external application, contact, purchase, or payment occurred.

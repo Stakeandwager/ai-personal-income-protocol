@@ -6,8 +6,11 @@
 - Offline demo planning with no API key and no API charge.
 - Optional OpenAI Responses API integration when the owner explicitly enables it.
 - Optional API web search, separately disabled by default.
-- Local JSONL plan and audit records.
+- Live API plans use a typed JSON action list; the local policy kernel assigns statuses and retains URL citation annotations when web search is enabled.
+- Local JSONL plan snapshots and audit records.
+- A run button for the allowlisted local proposal-draft action, with a saved artifact and SHA-256 evidence reference.
 - A manual outcome recorder that explicitly labels user-reported outcomes as unverified.
+- Plan status is projected from the append-only outcome log: `DRAFT` or `IN_PROGRESS` may transition to one terminal result (`TESTED_DEMAND`, `TESTED_NO_DEMAND`, or `ABANDONED_WITH_REASON`). Terminal outcomes cannot be overwritten through the console.
 - No execution of GPT-generated code, no customer outreach, no publishing, no purchases, no financial transfers, and no custody of funds.
 
 ## Windows quick start
@@ -42,12 +45,12 @@ The app writes `data/private-console/plans.jsonl` and `data/private-console/even
 
 ## Trust boundary
 
-GPT output is untrusted advice, not executable authority. This prototype cannot send messages, log in to third-party sites, submit applications, accept contracts, purchase anything, move money, or independently verify payment. The outcome recorder stores a user-reported status only. Evidence references should avoid exposing confidential details.
+GPT output is untrusted advice, not executable authority. Only typed local draft preparation has an executor. Public-source tasks and marketplace applications remain blocked without adapters. The prototype cannot log in to third-party sites, accept contracts, purchase anything, move money, or independently verify payment. The outcome recorder stores a user-reported status only. Evidence references should avoid exposing confidential details.
 
 ## Next build stages
 
-1. Add an allowlisted source connector for opportunity discovery with source URL, capture time, and freshness tracking.
-2. Add a typed action queue with explicit approval states and policy checks.
+1. Add a permitted source executor with source URL, capture time, eligibility evidence, and freshness checks.
+2. Add verified marketplace integration; request scoped owner approval only immediately before a supported submission.
 3. Add a background scheduler with hard runtime/API budgets and a kill switch.
 4. Add OAuth integrations only for supported official APIs and the minimum necessary permissions.
 5. Add payment-provider read-only reconciliation only if supported, consented to, and affordable.

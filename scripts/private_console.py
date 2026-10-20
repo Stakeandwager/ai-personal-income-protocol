@@ -8,6 +8,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import re
 import secrets
 import threading
 import urllib.error
@@ -17,6 +18,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+try:
+    from scripts.apip_workflow import build_workflow, execute_local_action
+except ModuleNotFoundError:  # Direct `python scripts/private_console.py` startup.
+    from apip_workflow import build_workflow, execute_local_action
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data" / "private-console"
 EVENTS_FILE = DATA_DIR / "events.jsonl"
@@ -25,6 +31,7 @@ HOST = "127.0.0.1"
 PORT = int(os.environ.get("APIP_CONSOLE_PORT", "8765"))
 MAX_BODY = 16_000
 VALID_OUTCOMES = {"TESTED_DEMAND", "TESTED_NO_DEMAND", "IN_PROGRESS", "ABANDONED_WITH_REASON"}
+TERMINAL_OUTCOMES = {"TESTED_DEMAND", "TESTED_NO_DEMAND", "ABANDONED_WITH_REASON"}
 LOCK = threading.Lock()
 CSRF_TOKEN = secrets.token_urlsafe(32)
 
@@ -34,7 +41,7 @@ def now_utc() -> str:
 
 
 def append_jsonl(path: Path, record: dict) -> None:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
     with LOCK, path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
@@ -49,6 +56,49 @@ def read_jsonl(path: Path, limit: int = 12) -> list[dict]:
         except json.JSONDecodeError:
             continue
     return list(reversed(rows[-limit:]))
+
+
+def read_plans(limit: int = 12) -> list[dict]:
+    """Project append-only plan snapshots to the newest version per plan ID."""
+    latest = {}
+    for plan in read_jsonl(PLANS_FILE, limit=1_000_000):
+        plan_id = plan.get("plan_id")
+        if plan_id and plan_id not in latest:
+            latest[plan_id] = plan
+    return list(latest.values())[:limit]
+
+
+def plan_status(plan_id: str, events: list[dict]) -> str:
+    """Project the latest user-reported outcome onto a plan's display status."""
+    for event in events:
+        if event.get("event") == "OUTCOME_RECORDED" and event.get("plan_id") == plan_id:
+            return str(event.get("outcome", "DRAFT"))
+    return "DRAFT"
+
+
+def can_record_outcome(current_status: str, outcome: str) -> bool:
+    """Only active plans can transition; terminal outcomes cannot be overwritten."""
+    if outcome not in VALID_OUTCOMES:
+        return False
+    if current_status in TERMINAL_OUTCOMES:
+        return False
+    return current_status in {"DRAFT", "IN_PROGRESS"}
+
+
+def record_outcome(plan_id: str, outcome: str, evidence: str, path: Path = EVENTS_FILE) -> tuple[bool, str]:
+    """Check and append a transition under one lock to prevent double terminal states."""
+    with LOCK:
+        current_status = plan_status(plan_id, read_jsonl(path, limit=1_000_000))
+        if not can_record_outcome(current_status, outcome):
+            return False, current_status
+        path.parent.mkdir(parents=True, exist_ok=True)
+        record = {"at_utc": now_utc(), "event": "OUTCOME_RECORDED", "plan_id": plan_id,
+                  "outcome": outcome, "evidence_reference_or_note": evidence,
+                  "payment_verified": False,
+                  "summary": f"{plan_id}: {outcome}; user-reported and not independently verified"}
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, ensure_ascii=False) + "\n")
+        return True, current_status
 
 
 def safe_text(value: str, max_len: int = 3000) -> str:
@@ -85,6 +135,53 @@ def local_plan(objective: str, skills: str, constraints: str, location: str) -> 
     )
 
 
+def parse_ai_execution_plan(text: str) -> tuple[str, list[dict]]:
+    """Accept bounded JSON action suggestions; policy is assigned separately."""
+    # Web-search citations can be appended to output text; preserve their
+    # authoritative URL annotations separately and remove only citation tokens.
+    text = re.sub(r"cite[^]+", "", text).strip()
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"AI plan was not valid structured JSON: {exc.msg}") from None
+    if not isinstance(payload, dict) or not isinstance(payload.get("actions"), list):
+        raise RuntimeError("AI plan must contain an actions array.")
+    summary = safe_text(payload.get("plan", ""), 6000)
+    if not summary:
+        raise RuntimeError("AI plan did not include a readable plan summary.")
+    actions = []
+    for item in payload["actions"][:20]:
+        if isinstance(item, dict):
+            actions.append({
+                "type": safe_text(item.get("type", ""), 80),
+                "description": safe_text(item.get("description", ""), 500),
+                "data": item.get("data") if isinstance(item.get("data"), dict) else {},
+            })
+    return summary, actions
+
+
+def extract_response_text_and_sources(data: dict) -> tuple[str, list[dict]]:
+    """Read response text plus first-party URL citations returned by web search."""
+    pieces, sources = [], []
+    for item in data.get("output", []):
+        if item.get("type") != "message":
+            continue
+        for content in item.get("content", []):
+            if content.get("type") != "output_text":
+                continue
+            if content.get("text"):
+                pieces.append(content["text"])
+            for annotation in content.get("annotations", []):
+                citation = annotation.get("url_citation", annotation)
+                if annotation.get("type") == "url_citation" and citation.get("url", "").startswith("https://"):
+                    sources.append({
+                        "title": safe_text(citation.get("title", "Public source"), 300),
+                        "url": safe_text(citation.get("url", ""), 1000),
+                    })
+    unique = {(source["url"]): source for source in sources}
+    return "\n\n".join(pieces).strip(), list(unique.values())
+
+
 def call_openai(objective: str, skills: str, constraints: str, location: str) -> tuple[str, dict]:
     key = os.environ.get("OPENAI_API_KEY", "").strip()
     model = os.environ.get("OPENAI_MODEL", "").strip()
@@ -95,10 +192,10 @@ def call_openai(objective: str, skills: str, constraints: str, location: str) ->
     if not model:
         raise RuntimeError("OPENAI_MODEL is not set. Set it to a model available in your API account.")
 
-    prompt = f"""You are APIP, an evidence-driven personal income opportunity planner.
+    prompt = f"""You are APIP, an evidence-driven personal income workflow planner.
 Build a practical, low-cost plan from the user's objective. Be candid about uncertainty; do not guarantee earnings.
-Return plain text with these headings: OBJECTIVE, OPPORTUNITY HYPOTHESES, NEXT 3 ACTIONS, VALIDATION TEST, RISKS / CHECKS, COST / MONEY, AUTONOMY BOUNDARY.
-Prefer real, specific opportunity sources if web search is enabled, and distinguish sourced facts from hypotheses. Never claim you contacted anyone, delivered work, or verified payment. Do not generate executable code or instructions for evading law, platform rules, consent, or access controls. No external action is authorized by this request. Assume a NGN 0 spending ceiling. Suggest only actions the user can review before execution.
+Return only a JSON object with keys `plan` (a plain-language execution plan) and `actions` (an array of at most 12 objects, each having `type`, `description`, and `data` fields).
+Allowed action types: `research_public_listing`, `prepare_proposal_draft`, `submit_proposal`, `spend_money`, `accept_contract`, `move_money`. Never invent source facts, buyer replies, skills, credentials, or payment. If owner skills are not provided, leave `owner_confirmed_facts` empty. No external action or spending is authorized by this prompt. Assume a NGN 0 spending limit and unknown prior spend. Use `research_public_listing` only when web search is enabled; distinguish observed facts and estimates in the plan. A type is a suggestion only: APIP's policy layer decides what can run.
 
 USER OBJECTIVE: {objective}
 SKILLS / RESOURCES: {skills or 'Not specified'}
@@ -124,37 +221,69 @@ CONSTRAINTS: {constraints or 'No upfront spend; owner approval before external a
     except (urllib.error.URLError, TimeoutError) as exc:
         raise RuntimeError(f"API connection failed: {exc}") from None
 
-    pieces = []
-    for item in data.get("output", []):
-        if item.get("type") == "message":
-            for content in item.get("content", []):
-                if content.get("type") == "output_text" and content.get("text"):
-                    pieces.append(content["text"])
-    result = "\n\n".join(pieces).strip()
-    if not result:
+    raw_result, sources = extract_response_text_and_sources(data)
+    if not raw_result:
         raise RuntimeError("The API response contained no readable output text.")
+    result, actions = parse_ai_execution_plan(raw_result)
     metadata = {
         "mode": "live_api",
         "model": model,
         "web_search_enabled": os.environ.get("APIP_WEB_SEARCH", "0") == "1",
         "api_cost_usd": "not calculated by this prototype",
+        "proposed_actions": actions,
+        "sources": sources,
     }
     return result, metadata
 
 
 def make_page(message: str = "") -> bytes:
-    plans = read_jsonl(PLANS_FILE)
+    plans = read_plans()
     events = read_jsonl(EVENTS_FILE)
+    all_events = read_jsonl(EVENTS_FILE, limit=1_000_000)
     plan_cards = []
     for p in plans:
         body = html.escape(p.get("plan", ""))
-        meta = html.escape(f"{p.get('created_at_utc','')} · {p.get('mode','')} · {p.get('status','DRAFT')}")
-        plan_cards.append(f'<article><p class="meta">{meta}</p><pre>{body}</pre><form method="post" action="/outcome"><input type="hidden" name="csrf_token" value="{CSRF_TOKEN}"><input type="hidden" name="plan_id" value="{html.escape(p.get("plan_id", ""))}"><label>Record actual outcome<select name="outcome"><option value="IN_PROGRESS">Still working</option><option value="TESTED_DEMAND">Tested: demand evidence</option><option value="TESTED_NO_DEMAND">Tested: no demand</option><option value="ABANDONED_WITH_REASON">Abandoned with reason</option></select></label><input name="evidence" maxlength="500" placeholder="Evidence reference / short note (no secrets)"><button>Record outcome</button></form></article>')
+        status = plan_status(p.get("plan_id", ""), all_events)
+        meta = html.escape(f"{p.get('created_at_utc','')} · {p.get('mode','')} · {status}")
+        workflow = p.get("workflow", {})
+        action_cards = []
+        for action in workflow.get("actions", []):
+            action_status = html.escape(action.get("status", "UNSUPPORTED"))
+            reason = html.escape(action.get("policy_reason", ""))
+            description = html.escape(action.get("description") or action.get("type", ""))
+            run_form = ""
+            if action.get("status") == "READY" and action.get("type") == "prepare_proposal_draft":
+                run_form = (f'<form method="post" action="/action"><input type="hidden" name="csrf_token" value="{CSRF_TOKEN}">'
+                            f'<input type="hidden" name="plan_id" value="{html.escape(p.get("plan_id", ""))}">'
+                            f'<input type="hidden" name="action_id" value="{html.escape(action.get("action_id", ""))}">'
+                            '<button type="submit">Prepare local draft</button></form>')
+            evidence = action.get("evidence") or {}
+            evidence_note = html.escape(f"Evidence: {evidence.get('path')} · SHA-256 {evidence.get('sha256')}") if evidence else ""
+            action_cards.append(f'<li><strong>{description}</strong> — {action_status}<br><span class="meta">{reason} {evidence_note}</span>{run_form}</li>')
+        if action_cards:
+            action_section = f'<h3>Execution steps · {html.escape(workflow.get("status", "UNKNOWN"))}</h3><ul>{"".join(action_cards)}</ul>'
+        elif workflow:
+            action_section = '<h3>Execution steps</h3><p class="sub">No typed actions were returned. Offline demo plans are advisory only.</p>'
+        else:
+            action_section = '<p class="sub">This saved plan predates typed action tracking.</p>'
+        source_links = []
+        for source in p.get("metadata", {}).get("sources", []):
+            parsed_source = urlparse(source.get("url", ""))
+            if parsed_source.scheme == "https" and parsed_source.hostname:
+                title = html.escape(source.get("title") or "Public source")
+                url = html.escape(source["url"], quote=True)
+                source_links.append(f'<li><a href="{url}" target="_blank" rel="noopener noreferrer">{title}</a></li>')
+        if source_links:
+            action_section += f'<h3>Source evidence</h3><ul>{"".join(source_links)}</ul>'
+        form = ""
+        if status not in TERMINAL_OUTCOMES:
+            form = f'<form method="post" action="/outcome"><input type="hidden" name="csrf_token" value="{CSRF_TOKEN}"><input type="hidden" name="plan_id" value="{html.escape(p.get("plan_id", ""))}"><label>Record actual outcome<select name="outcome"><option value="IN_PROGRESS">Still working</option><option value="TESTED_DEMAND">Tested: demand evidence</option><option value="TESTED_NO_DEMAND">Tested: no demand</option><option value="ABANDONED_WITH_REASON">Abandoned with reason</option></select></label><input name="evidence" maxlength="500" placeholder="Evidence reference / short note (no secrets)"><button>Record outcome</button></form>'
+        plan_cards.append(f'<article><p class="meta">{meta}</p><pre>{body}</pre>{action_section}{form}</article>')
     event_lines = "".join(f'<li><span class="meta">{html.escape(e.get("at_utc", ""))}</span> — {html.escape(e.get("event", ""))}: {html.escape(e.get("summary", ""))}</li>' for e in events)
     notice = f'<p class="notice">{html.escape(message)}</p>' if message else ""
     page = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>APIP Private Console</title><style>
 :root{{color-scheme:light dark;font:16px system-ui,sans-serif}}body{{max-width:960px;margin:0 auto;padding:24px;line-height:1.5}}h1{{margin-bottom:4px}}.sub,.meta{{opacity:.72;font-size:.9rem}}form,.panel,article{{border:1px solid #8886;border-radius:12px;padding:16px;margin:16px 0}}label{{display:block;margin:12px 0 5px}}input,textarea,select{{box-sizing:border-box;width:100%;padding:10px;border:1px solid #8888;border-radius:8px;font:inherit}}button{{padding:10px 14px;border:0;border-radius:8px;margin-top:12px;cursor:pointer;font-weight:650}}textarea{{min-height:86px}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}}.notice{{padding:12px;border-left:4px solid #888;background:#8881}}.grid{{display:grid;grid-template-columns:1fr 1fr;gap:12px}}@media(max-width:640px){{.grid{{grid-template-columns:1fr}}}}li{{margin:8px 0}}.pill{{display:inline-block;border:1px solid #8888;border-radius:99px;padding:3px 9px;font-size:.8rem}}
-</style></head><body><h1>APIP Private Console</h1><p class="sub">Local-only prototype · binds to 127.0.0.1 · no money custody · no external actions</p>{notice}<div class="panel"><span class="pill">DRAFT-ONLY EXECUTION</span><p>Describe what you want to achieve. APIP will create an opportunity plan. It will not send messages, publish offers, run generated code, spend money, or transfer funds.</p><form method="post" action="/plan"><input type="hidden" name="csrf_token" value="{CSRF_TOKEN}"><label for="objective">Your objective *</label><textarea id="objective" name="objective" required maxlength="3000" placeholder="I need to earn income. I can do ... and have ...">{''}</textarea><div class="grid"><div><label for="skills">Skills and resources</label><textarea id="skills" name="skills" maxlength="2000" placeholder="Skills, device, time available, portfolio"></textarea></div><div><label for="location">Target market / location</label><textarea id="location" name="location" maxlength="500" placeholder="For example: Lagos, Nigeria; remote work"></textarea></div></div><label for="constraints">Constraints</label><textarea id="constraints" name="constraints" maxlength="1500" placeholder="Default: no upfront spend; no external actions without approval"></textarea><button type="submit">Build opportunity plan</button></form><p class="meta">Live API calls are off by default. Demo mode works without an API key or API cost.</p></div><h2>Saved plans</h2>{''.join(plan_cards) if plan_cards else '<p class="sub">No plans saved yet. Create your first plan above.</p>'}<h2>Recent audit events</h2><ul>{event_lines if event_lines else '<li class="sub">No events recorded yet.</li>'}</ul><p class="sub">Local records live under data/private-console/ and are excluded from Git. Do not enter passwords, API keys, banking details, medical records, or unnecessary personal data.</p></body></html>'''
+</style></head><body><h1>APIP Private Console</h1><p class="sub">Local-only workflow prototype · binds to 127.0.0.1 · no money custody</p>{notice}<div class="panel"><span class="pill">BOUNDED EXECUTION</span><p>Describe your objective. APIP can run allowlisted local work and record evidence. External research or actions run only when a supported capability exists; buyer contact, spending, legal acceptance, and money movement remain gated or owner-handled.</p><form method="post" action="/plan"><input type="hidden" name="csrf_token" value="{CSRF_TOKEN}"><label for="objective">Your objective *</label><textarea id="objective" name="objective" required maxlength="3000" placeholder="I need to earn income. I can do ... and have ...">{''}</textarea><div class="grid"><div><label for="skills">Skills and resources</label><textarea id="skills" name="skills" maxlength="2000" placeholder="Skills, device, time available, portfolio"></textarea></div><div><label for="location">Target market / location</label><textarea id="location" name="location" maxlength="500" placeholder="For example: Lagos, Nigeria; remote work"></textarea></div></div><label for="constraints">Constraints</label><textarea id="constraints" name="constraints" maxlength="1500" placeholder="Default: no upfront spend; no external actions without approval"></textarea><button type="submit">Build execution plan</button></form><p class="meta">Live API calls are off by default. Offline demo planning uses no API key or API cost; its suggestions are not live research.</p></div><h2>Saved workflows</h2>{''.join(plan_cards) if plan_cards else '<p class="sub">No plans yet. Describe an objective to begin.</p>'}<h2>Recent audit events</h2><ul>{event_lines if event_lines else '<li class="sub">No events recorded yet.</li>'}</ul><p class="sub">Local records live under data/private-console/ and are excluded from Git. Do not enter passwords, API keys, banking details, medical records, or unnecessary personal data.</p></body></html>'''
     return page.encode("utf-8")
 
 
@@ -245,10 +374,33 @@ class Handler(BaseHTTPRequestHandler):
                     self._send(200, make_page(f"Live request did not complete: {exc}. No external action was taken."))
                     return
             plan_id = secrets.token_hex(8)
-            record = {"plan_id": plan_id, "created_at_utc": now_utc(), "objective": objective, "skills": skills, "location": location, "constraints": constraints, "plan": plan, "mode": mode, "metadata": metadata, "status": "DRAFT", "external_actions_performed": False, "income_verified": False}
+            workflow = build_workflow(objective, metadata.get("proposed_actions", []), authority={})
+            record = {"plan_id": plan_id, "created_at_utc": now_utc(), "objective": objective, "skills": skills, "location": location, "constraints": constraints, "plan": plan, "mode": mode, "metadata": metadata, "workflow": workflow, "status": "DRAFT", "external_actions_performed": False, "income_verified": False}
             append_jsonl(PLANS_FILE, record)
-            append_jsonl(EVENTS_FILE, {"at_utc": now_utc(), "event": "PLAN_CREATED", "summary": f"{plan_id} ({mode}); external actions none; income not verified"})
-            self._send(200, make_page(f"Plan saved as {plan_id} ({mode}). No external action was taken."))
+            append_jsonl(EVENTS_FILE, {"at_utc": now_utc(), "event": "PLAN_CREATED", "summary": f"{plan_id} ({mode}); workflow={workflow['status']}; actions={len(workflow['actions'])}; no external action or verified income"})
+            self._send(200, make_page(f"Workflow saved as {plan_id} ({mode}). Review its action statuses below."))
+            return
+
+        if route == "/action":
+            plan_id, action_id = value("plan_id"), value("action_id")
+            plan = next((item for item in read_plans(limit=10000) if item.get("plan_id") == plan_id), None)
+            if not plan or not plan.get("workflow"):
+                self._send(404, make_page("Action not run: workflow not found."))
+                return
+            try:
+                event = execute_local_action(plan["workflow"], action_id, DATA_DIR)
+            except ValueError as exc:
+                self._send(400, make_page(f"Action not run: {exc}"))
+                return
+            except PermissionError as exc:
+                self._send(409, make_page(f"Action not run: {exc}"))
+                return
+            except OSError:
+                self._send(500, make_page("Action could not be written. Existing files were preserved."))
+                return
+            append_jsonl(PLANS_FILE, plan)
+            append_jsonl(EVENTS_FILE, {"at_utc": event["at_utc"], "event": event["event"], "summary": f"{action_id} completed locally; artifact hash={event['evidence']['sha256']}; no external action or payment"})
+            self._send(200, make_page(f"Local action completed. Draft: {event['evidence']['path']} · SHA-256 {event['evidence']['sha256']}. Nothing was submitted."))
             return
 
         if route == "/outcome":
@@ -256,11 +408,14 @@ class Handler(BaseHTTPRequestHandler):
             if not plan_id or outcome not in VALID_OUTCOMES:
                 self._send(400, make_page("Outcome not recorded: invalid plan or outcome."))
                 return
-            known = any(p.get("plan_id") == plan_id for p in read_jsonl(PLANS_FILE, limit=10000))
+            known = any(p.get("plan_id") == plan_id for p in read_plans(limit=10000))
             if not known:
                 self._send(404, make_page("Outcome not recorded: plan ID not found."))
                 return
-            append_jsonl(EVENTS_FILE, {"at_utc": now_utc(), "event": "OUTCOME_RECORDED", "plan_id": plan_id, "outcome": outcome, "evidence_reference_or_note": evidence, "payment_verified": False, "summary": f"{plan_id}: {outcome}; not independently verified"})
+            recorded, current_status = record_outcome(plan_id, outcome, evidence)
+            if not recorded:
+                self._send(409, make_page(f"Outcome not recorded: {plan_id} is already {current_status}."))
+                return
             self._send(200, make_page(f"Outcome recorded for {plan_id}. This is a user-reported outcome, not independent verification."))
             return
 
