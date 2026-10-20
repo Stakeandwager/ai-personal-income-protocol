@@ -1,0 +1,16 @@
+
+test_first_run_selects_an_opportunity (test_apip_cycle.APIPCycleTests.test_first_run_selects_an_opportunity) ... ok
+test_terminal_result_moves_to_another_untested_idea (test_apip_cycle.APIPCycleTests.test_terminal_result_moves_to_another_untested_idea) ... ok
+test_terminal_statuses_are_explicit (test_apip_cycle.APIPCycleTests.test_terminal_statuses_are_explicit) ... ok
+test_unfinished_selection_is_not_skipped (test_apip_cycle.APIPCycleTests.test_unfinished_selection_is_not_skipped) ... ok
+test_does_not_claim_ai_or_income (test_opportunity_engine.OpportunityEngineTests.test_does_not_claim_ai_or_income) ... ok
+test_generates_multiple_hypotheses (test_opportunity_engine.OpportunityEngineTests.test_generates_multiple_hypotheses) ... ok
+test_ideas_are_explicitly_unvalidated_and_zero_cost (test_opportunity_engine.OpportunityEngineTests.test_ideas_are_explicitly_unvalidated_and_zero_cost) ... ok
+test_readiness_score_is_not_a_sales_probability (test_opportunity_engine.OpportunityEngineTests.test_readiness_score_is_not_a_sales_probability) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.000s
+
+OK
+
+Exit code: 0

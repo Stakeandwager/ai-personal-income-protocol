@@ -1,0 +1,3 @@
+company,reason,action
+Northstar Bakery,Conflicting phone values across otherwise matching rows,Withheld from cleaned output pending client confirmation
+Unknown Store,Contact name email phone and city are missing,Retained company label only; no values inferred

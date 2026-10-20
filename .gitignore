@@ -4,3 +4,9 @@ __pycache__/
 .env
 .venv/
 venv/
+
+# APIP local-only private console records
+data/private-console/
+
+# Local spending and engineering-run lock data (may contain receipt references)
+data/private-spending/

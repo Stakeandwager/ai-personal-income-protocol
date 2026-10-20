@@ -1,0 +1,44 @@
+name: APIP Scheduled Validation and Opportunity Cycle
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apip-scheduled-validation
+  cancel-in-progress: false
+
+jobs:
+  validate-and-cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run automated tests
+        run: python -m unittest discover -s tests -v
+      - name: Generate opportunity hypotheses
+        run: python scripts/opportunity_engine.py
+      - name: Select and record next experiment
+        run: python scripts/apip_cycle.py
+      - name: Validate income ledger and generate report
+        run: python scripts/run_protocol.py
+      - name: Commit generated reports and experiment state if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest-report.md reports/opportunities-latest.json reports/apip-next-action.md reports/apip-cycle-state.json data/experiment-events.jsonl
+          if git diff --cached --quiet; then
+            echo "Generated outputs unchanged; no commit needed."
+          else
+            git commit -m "chore: run APIP opportunity cycle"
+            git push
+          fi
