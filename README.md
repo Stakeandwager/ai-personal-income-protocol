@@ -27,6 +27,11 @@ Report output:
 ## Automation
 The GitHub Actions workflow is configured to support scheduled and manual validation. Its first successful run remains to be verified.
 
+## Netlify owner app — prototype
+The `web/` and `netlify/functions/` folders contain a Netlify-ready private owner dashboard. It is designed to show a public-source jobs feed, save leads and evidence, track owner-reported progress, draft offers, and mark payout-provider setup without storing bank credentials. The scheduled Remotive feed runs up to four times daily after Netlify deployment. It obeys the source's attribution and freshness rules.
+
+The site is **not deployed** and this is not a validated commercial product. Before deployment, connect this repository to Netlify, enable invite-only Identity, invite the owner, and test a deploy preview. Applications, external outreach, contract signing, payment processing, and receipt verification are not implemented. Read `docs/APIP_NETLIFY_OWNER_APP.md` for setup and boundaries.
+
 ## Financial truth
 A passing test means the software passed its checks. It does not mean income has been earned. Ledger figures are only as reliable as their evidence.
 
