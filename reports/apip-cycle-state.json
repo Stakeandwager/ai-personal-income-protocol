@@ -1,0 +1,18 @@
+{
+  "run_id": "20261020T003528.666583+0000",
+  "generated_at_utc": "2026-10-20T00:35:28.666583+00:00",
+  "status": "READY_FOR_ZERO_COST_TEST",
+  "selected_opportunity_id": "APIP_PROTOCOL_SETUP",
+  "selected_customer": "Solo builders and small teams",
+  "problem": "Income experiments may lack clear evidence, cost, and outcome tracking",
+  "deliverable": "A configured experiment ledger and validation report",
+  "validation_test": "Prepare a demo ledger and ask target users whether it solves a real tracking problem",
+  "revenue_path": "Offer a setup service using the APIP approach",
+  "estimated_cost_ceiling_ngn": 0,
+  "ai_model_used": false,
+  "external_outreach_performed": false,
+  "money_movement_performed": false,
+  "income_generated_or_verified": false,
+  "recorded_events_for_opportunity": 0,
+  "next_instruction": "Create the sample deliverable. Record evidence and outcome before claiming demand or income. External contact/publication requires owner approval."
+}
