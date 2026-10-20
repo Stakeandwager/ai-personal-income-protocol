@@ -32,6 +32,10 @@ The `web/` and `netlify/functions/` folders contain a Netlify-ready private owne
 
 The site is **not deployed** and this is not a validated commercial product. Before deployment, connect this repository to Netlify, enable invite-only Identity, invite the owner, and test a deploy preview. Applications, external outreach, contract signing, payment processing, and receipt verification are not implemented. Read `docs/APIP_NETLIFY_OWNER_APP.md` for setup and boundaries.
 
+## Autonomous workflow foundation
+
+`scripts/apip_workflow.py` is the first typed execution-policy layer: it can create a local proposal draft with evidence, while public-source research and external applications are marked blocked until their integrations exist. Spend waits for an evidenced opening balance and explicit limit; legal and money-movement actions stay with the owner. The policy kernel is not yet connected to the private console planner. See `docs/APIP_AUTONOMOUS_WORKFLOW_V2.md`.
+
 ## Financial truth
 A passing test means the software passed its checks. It does not mean income has been earned. Ledger figures are only as reliable as their evidence.
 
