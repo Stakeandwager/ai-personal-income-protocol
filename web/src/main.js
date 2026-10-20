@@ -2,7 +2,9 @@ import "./style.css";
 import { acceptInvite, getUser, handleAuthCallback, login, logout, onAuthChange } from "@netlify/identity";
 
 const root = document.querySelector("#app");
-const state = { user: null, events: [], jobs: [], query: "", tab: "discover", invite: null, busy: false };
+const previewMode = ["localhost", "127.0.0.1"].includes(location.hostname) && new URLSearchParams(location.search).get("preview") === "1";
+const state = { user: null, events: [], jobs: [], query: "", tab: "discover", invite: null, busy: false, preview: previewMode };
+const demoJobs = [{ id: "remotive-6303439", title: "DATA ENTRY INTERN", company: "Basecodetech", category: "Data entry and research", jobType: "Internship", location: "Nigeria · Victoria Island, Lagos or surrounding areas", salary: "NGN 70,000/month", published: "Listed about 1 week ago · checked 2026-10-20", summary: "Real Remotive listing snapshot. Research, verify and organize business information in spreadsheets. The listing requires a laptop, dependable internet/electricity, prior data-entry or research experience, and residence in Victoria Island, Lagos or nearby. Verify that the employer is still accepting applications and that you meet the location and skills requirements before applying.", source: "Remotive · public listing snapshot", url: "https://remotive.com/remote/jobs/all-others/data-entry-intern-6303439" }];
 const STATUS = ["saved", "qualified", "draft_ready", "proposal_sent_owner", "contract_funded_owner", "delivered_owner", "payment_reported_owner"];
 const STATUS_LABEL = { saved: "Saved", qualified: "Qualified", draft_ready: "Draft ready", proposal_sent_owner: "Sent by owner", contract_funded_owner: "Funded contract", delivered_owner: "Delivered", payment_reported_owner: "Payment reported" };
 const PROVIDERS = [
@@ -29,6 +31,12 @@ async function api(path, options = {}) {
 }
 
 async function loadData() {
+  if (state.preview) {
+    try { state.events = JSON.parse(localStorage.getItem("apip-local-demo-events") || "[]"); } catch { state.events = []; }
+    state.jobs = demoJobs;
+    state.sourceUpdated = "Remotive listing checked 2026-10-20 · local snapshot; API feed not connected";
+    return;
+  }
   const [workspace, jobs] = await Promise.all([api("/api/workspace"), api("/api/jobs")]);
   state.events = workspace.events || [];
   state.jobs = jobs.jobs || [];
@@ -36,6 +44,13 @@ async function loadData() {
 }
 
 async function addEvent(event) {
+  if (state.preview) {
+    const item = { ...event, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+    state.events.push(item);
+    localStorage.setItem("apip-local-demo-events", JSON.stringify(state.events));
+    render();
+    return;
+  }
   await api("/api/workspace", { method: "POST", body: JSON.stringify(event) });
   await loadData();
   render();
@@ -49,7 +64,9 @@ function shell() {
   brand.append(el("div", "brand-mark", "A"));
   const word = el("div"); word.append(el("div", "brand-name", "APIP"), el("div", "brand-sub", "Income operations")); brand.append(word); top.append(brand);
   if (state.user) {
-    const u = el("div", "user-box"); u.append(el("span", "", state.user.email || "Owner"), button("Sign out", async () => { await logout(); state.user = null; render(); }, "button ghost small")); top.append(u);
+    const u = el("div", "user-box"); u.append(el("span", "", state.user.email || "Owner"));
+    if (!state.preview) u.append(button("Sign out", async () => { await logout(); state.user = null; render(); }, "button ghost small"));
+    top.append(u);
   }
   frame.append(top);
   root.append(frame);
@@ -199,6 +216,7 @@ function render() {
   const frame = shell();
   const hero = el("section", "hero"); const text = el("div"); text.append(el("div", "eyebrow", "Evidence first · owner in control"), el("h1", "Turn opportunities into receipts."), el("p", "APIP finds public leads, tracks your next move, drafts offers and contract terms, and keeps payment claims separate from verified money received."));
   hero.append(text, el("div", "live-status", "●  PRIVATE WORKSPACE · NO AUTO-SUBMISSIONS")); frame.append(hero, createStats());
+  if (state.preview) frame.append(el("div", "note warning", "LOCAL PREVIEW · The lead is a real Remotive public listing snapshot checked 2026-10-20; the API feed and account are not connected. Verify the listing, location, and requirements before applying. Saved records stay in this browser. No buyer contact, contract, or payment is connected; preview activity is not income."));
   frame.append(el("div", "note warning", "Current stage: prototype. Job feed is limited to a permitted public API; marketplace accounts, offer submission, signatures, and money movement are not connected. A listing or draft is not income."));
   frame.append(navTabs()); const main = el("div");
   if (state.tab === "discover") discoverView(main); else if (state.tab === "pipeline") pipelineView(main); else if (state.tab === "contracts") contractsView(main); else paymentsView(main);
@@ -212,6 +230,11 @@ async function ready() {
 }
 
 async function boot() {
+  if (state.preview) {
+    state.user = { email: "Local demo · no account" };
+    await ready();
+    return;
+  }
   try {
     const result = await handleAuthCallback();
     if (result?.type === "invite" && result.token) { state.invite = { token: result.token, email: result.user?.email }; authView(); return; }

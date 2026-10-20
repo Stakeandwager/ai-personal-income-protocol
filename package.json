@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "check": "node --input-type=module --check < web/src/main.js && node --input-type=module --check < netlify/functions/jobs.mjs && node --input-type=module --check < netlify/functions/workspace.mjs && node --input-type=module --check < netlify/functions/scheduled-remotive.mjs"
   },
