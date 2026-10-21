@@ -54,6 +54,36 @@ class PrivateConsoleTests(unittest.TestCase):
         token_field = f'name="csrf_token" value="{app.CSRF_TOKEN}"'
         self.assertEqual(page.count(token_field), 2)
 
+    def test_post_routes_reject_missing_invalid_and_tampered_csrf_tokens(self):
+        invalid_tokens = [
+            ("missing", None),
+            ("invalid", "not-the-token"),
+            ("tampered", app.CSRF_TOKEN[:-1] + ("a" if app.CSRF_TOKEN[-1] != "a" else "b")),
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            plans_path = Path(tmp) / "plans.jsonl"
+            events_path = Path(tmp) / "events.jsonl"
+            original_plan = '{"plan_id":"p1","workflow":{}}\n'
+            plans_path.write_text(original_plan, encoding="utf-8")
+            routes = (
+                ("/plan", {"objective": "Test"}),
+                ("/action", {"plan_id": "p1", "action_id": "a1"}),
+                ("/outcome", {"plan_id": "p1", "outcome": "IN_PROGRESS"}),
+            )
+            for route, fields in routes:
+                for label, token in invalid_tokens:
+                    with self.subTest(route=route, token=label), \
+                            patch.object(app, "PLANS_FILE", plans_path), \
+                            patch.object(app, "EVENTS_FILE", events_path):
+                        form = dict(fields)
+                        if token is not None:
+                            form["csrf_token"] = token
+                        status, response = self.post_form(route, form)
+                        self.assertEqual(status, 403)
+                        self.assertIn(b"missing or invalid security token", response)
+                        self.assertEqual(plans_path.read_text(encoding="utf-8"), original_plan)
+                        self.assertFalse(events_path.exists())
+
     def test_binds_only_loopback(self):
         self.assertEqual(app.HOST, "127.0.0.1")
 

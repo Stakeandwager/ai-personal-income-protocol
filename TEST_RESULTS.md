@@ -53,3 +53,11 @@
 - Full regression command: `python -m unittest discover -s tests -v` — PASS, 62 tests.
 - `npm run check` passed. `npm run build` passed for this code milestone; the later console integration changed only Python and documentation files.
 - Coverage includes typed JSON plan parsing, citation capture, append-only snapshot projection, local-only draft execution with hash evidence, and fail-closed marketplace/spend/legal action policy. No paid API request, external application, contact, purchase, or payment occurred.
+
+## 2026-10-20 — private-console CSRF rejection
+- Focused command: `python -m unittest discover -s tests -p test_private_console.py -v` — PASS, 18 tests.
+- Full regression command: `python -m unittest discover -s tests -v` — PASS, 64 tests.
+- Added HTTP coverage for missing, invalid, and tampered CSRF tokens against `/plan`, `/action`, and `/outcome` (nine rejected requests). Each returned 403 and left saved plan/event files unchanged.
+- No product code changed; this run verifies the existing CSRF guard. Market evidence refresh is recorded in `reports/current-paid-work-refresh-2026-10-20-1448-utc.md`; no external action, paid API call, purchase, or payment occurred.
+
+- Re-run after restoring the test file from the committed baseline on 2026-10-21: focused console suite PASS (18 tests); full suite PASS (64 tests).

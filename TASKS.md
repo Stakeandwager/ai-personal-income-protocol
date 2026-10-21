@@ -3,7 +3,7 @@
 ## Priority 1 — Verify unattended execution and secure state transitions
 - [ ] Observe a scheduled two-hour Codex automation run perform current public opportunity discovery, preserve source evidence, and record its run history; configuration is confirmed, discovery execution is not yet verified.
 - [ ] Enforce explicit console outcome transitions and reject duplicate or contradictory terminal outcomes.
-- [ ] Add negative HTTP tests for missing, invalid, and tampered CSRF tokens.
+- [x] Add negative HTTP tests for missing, invalid, and tampered CSRF tokens.
 - [ ] Review console concurrent writes and interrupted-write recovery.
 - [ ] Review GitHub Actions' `contents: write` permission and automatic report push before relying on it.
 

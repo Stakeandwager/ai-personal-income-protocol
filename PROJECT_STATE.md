@@ -60,3 +60,18 @@ No suitable real purchase, marketplace account, publishing channel, or outreach 
 - For recurring discovery, next: observe a scheduled run and independently verify that it searches public sources and records sourced opportunities rather than recycling generated hypotheses.
 - Current run lock was released after tests; `python scripts/apip_run_lock.py status` confirmed no lock is held.
 - See `TEST_RESULTS.md` for full commands, failures, and results.
+
+## Autonomous run — 2026-10-20 14:48 UTC
+
+- Acquired exclusive engineering lease `zqs0ZWucr5ywqkxAZHDZxPojZbF5-7jB`; lease held through final review and released afterward.
+- Focused Priority 1 improvement: HTTP regression coverage for missing, invalid, and tampered CSRF tokens on all three private-console POST routes. All nine cases returned 403 without changing plan or event records. No application code changed.
+- Verification: focused console suite passed 18 tests; full regression passed 64 tests. See `TEST_RESULTS.md`.
+- Refreshed public paid-work evidence and ranking in `reports/current-paid-work-shortlist-2026-10-20.md`. The best-matching buyer brief is an indexed Upwork US$10 Excel-cleanup post, but its direct page returned 403 and search metadata conflicted on recency; listing state and proposal cost remain unconfirmed. A Workana brief shows one bid but no stated budget and a zero-paid buyer profile. NipeX lists public oil tenders with supplier-category qualification requirements; these are not demonstrated APIP-fit services. The FAO Nigeria data-collection notice is expired.
+- No suitable APIP-owned marketplace, publishing, or outreach account was connected. No experiment was reserved or executed; no message, proposal, publication, purchase, paid API call, delivery, or payment occurred.
+- Income ledger has 0 recorded entries: this run gross NGN 0, fees/costs NGN 0, net NGN 0. Historical income, cumulative spend balance, and daily NGN 10,000 target attainment remain unverified without external reconciliation.
+- Next: reconcile cumulative prior spend and connect/verify an eligible marketplace account before considering any proposal. Observe an actual scheduled online discovery run separately; this manual run does not verify recurrence.
+
+## Verification follow-up — 2026-10-21
+
+- A failed patch attempt left the working test and shortlist files containing only zero bytes. The test file was restored from its committed baseline, the CSRF regression test was reapplied, and refreshed market evidence was saved in a separate report. Inspection before restoration showed only the just-added test diff, so no pre-existing test changes were lost.
+- Focused private-console tests passed 18/18 and full regression passed 64/64 after recovery. No product code changed. Detailed market evidence is in reports/current-paid-work-refresh-2026-10-20-1448-utc.md.
