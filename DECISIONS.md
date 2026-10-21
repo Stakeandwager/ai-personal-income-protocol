@@ -24,3 +24,6 @@
 
 ## Change log
 Add dated entries when the owner explicitly approves a change. Do not treat AI suggestions as owner decisions.
+
+## Additional owner authorization — 2026-10-21
+- For project records and backup, APIP may commit and push run-scoped project changes at the existing two-hour automation interval, after tests and diff review. Stage only changes created by that run; preserve unrelated user changes and exclude secrets/private data. Push only with a normal fast-forward to the configured upstream; never force-push, merge, or modify production. If checks fail, unrelated changes are present, or push is not a fast-forward, stop and report instead of publishing.
