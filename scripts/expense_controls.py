@@ -74,8 +74,8 @@ class ExpenseLedger:
         path = Path(path)
         if path.exists():
             raise LedgerUnavailable("Ledger path already exists; it will not be overwritten.")
-        limit_minor = _minor_units(authorized_limit_ngn)
-        opening_minor = _minor_units(opening_spend_ngn) if Decimal(str(opening_spend_ngn)) != 0 else 0
+        limit_minor = _minor_units(authorized_limit_usd)
+        opening_minor = _minor_units(opening_spend_usd) if Decimal(str(opening_spend_usd)) != 0 else 0
         if limit_minor > AUTHORIZED_LIMIT_MINOR:
             raise ExpenseError("Configured limit exceeds the owner's USD 1,000 lifetime authorization.")
         evidence = (opening_evidence or "").strip()
@@ -170,7 +170,7 @@ class ExpenseLedger:
                    (expense_id, event, evidence_ref.strip(), _now()))
 
     def propose(self, expense_id: str, amount_usd: Decimal | str | int, *, description: str) -> None:
-        amount = _minor_units(amount_ngn)
+        amount = _minor_units(amount_usd)
         if not expense_id.strip() or not description.strip():
             raise ExpenseError("Expense ID and description are required.")
         with closing(self._connect()) as db:
