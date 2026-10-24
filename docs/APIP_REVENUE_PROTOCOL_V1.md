@@ -2,7 +2,7 @@
 
 **Status:** Proposed operating protocol  
 **Purpose:** Move APIP from opportunity hypotheses to evidence-backed customer transactions.  
-**Default spend ceiling:** NGN 0  
+**Owner-authorized cumulative project cap:** USD 1,000 total, including prior APIP spending. **Live spending status:** BLOCKED until the opening balance is independently evidenced and currency-aware hard-stop controls are implemented and validated.  
 **Current verified income:** NGN 0 unless the ledger contains independently verifiable receipt evidence.
 
 ## 1. Governing rule
@@ -13,12 +13,12 @@ A hypothesis is not demand. A prospect is not a customer. A positive reply is no
 
 ## 2. Safety and authority
 
-1. No paid tools, advertising, subscriptions, paid data, borrowing, betting, or other expenditure unless the owner approves the exact cost and purpose in advance.
+1. The owner has authorized autonomous spending within a maximum cumulative APIP project cap of USD 1,000, including prior APIP spending, but real spending remains blocked until the cumulative opening balance is independently evidenced and currency-aware hard-stop controls are implemented and validated. Once those conditions pass, only lawful, necessary, one-off APIP project expenses within the evidenced remaining balance are in scope; no borrowing, betting, speculative trading, recurring auto-renew subscriptions, or commitments beyond the cap.
 2. No external messages, bulk outreach, public offer, account creation, contract, purchase, or payment action without explicit owner approval for the relevant action and scope.
 3. Use relevant, truthful, individualized outreach only. Do not use deceptive identities, false claims, evasion tactics, scraped sensitive data, or repeated unwanted contact. Respect platform terms, applicable law, opt-outs, and contact limits.
 4. Do not claim credentials, case studies, results, or delivery capability that have not been verified.
 5. Do not collect unnecessary personal data. Store only what is needed to manage the experiment and evidence.
-6. The owner retains authority over commitments, pricing exceptions, external publication, spending, and money movement. APIP may prepare drafts and recommendations; preparation is not authorization.
+6. The owner retains authority over external commitments, pricing exceptions, external publication, and money movement. The scoped USD 1,000 cumulative spending authorization is the only exception to per-expense approval, and it becomes executable only after the documented balance and validated hard-stop prerequisites pass. APIP may prepare drafts and recommendations; preparation is not authorization.
 7. Do not treat an AI-generated record, screenshot, or self-reported result as independent proof by itself.
 
 ## 3. The seven-stage revenue loop
@@ -142,4 +142,4 @@ The first milestone is not “workflow passed.” It is:
 4. payment actually received and verified;
 5. the result recorded truthfully with evidence.
 
-Until all five are evidenced, report the exact stage reached and keep verified income at NGN 0 / not established.
+Until all five are evidenced, report the exact stage reached and keep verified income at NGN 0 / not established. The USD 1,000 spending authorization is a ceiling, not available cash; missing opening-balance or conversion evidence must block real spending.
