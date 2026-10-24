@@ -1,0 +1,25 @@
+name: APIP Pull Request Tests
+
+on:
+  push:
+    branches:
+      - "feat/apip-usd-spending-controls"
+  pull_request:
+    branches:
+      - main
+      - "docs/apip-revenue-protocol-v1"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run full test suite
+        run: python -m unittest discover -s tests -v
