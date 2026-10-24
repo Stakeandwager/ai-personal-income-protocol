@@ -103,3 +103,12 @@ No suitable real purchase, marketplace account, publishing channel, or outreach 
 - **Actual remaining balance: UNKNOWN. Real spending: BLOCKED.** Cumulative opening spend has not been independently reconciled, and the expense controls have not yet been updated and validated for the new currency-aware cap.
 - Before real spending can be enabled, implement and test fail-closed opening-balance evidence, USD-equivalent cap enforcement, transaction-reference deduplication, and reliable conversion-rate evidence for non-USD expenses. If any prerequisite is absent, reject the spend attempt.
 - This documentation update did not initiate a purchase, payment, subscription, external message, publication, or contract. No income is implied by the authorization.
+
+
+## USD spending-controls implementation — 2026-10-24
+
+- Implemented on branch `feat/apip-usd-spending-controls`: expense ledger version 2 stores amounts as USD cents and enforces the hard US$1,000 cumulative lifetime cap in code. New ledgers must use the renamed USD arguments. Version-1 ledgers are rejected rather than silently migrated or reinterpreted.
+- Deliberate limitation: non-USD expenses and foreign-exchange conversion are **not supported** by this increment. Do not convert NGN amounts mentally or enter an approximate USD equivalent. Add evidenced exchange-rate source/date and tested conversion before allowing non-USD spending.
+- Added a GitHub Actions test workflow for pushes to this branch and pull requests. Tests use temporary databases and simulated evidence only; they do not authorize or execute payments.
+- Actual opening spend and remaining authorized balance remain UNKNOWN. The live private ledger is not initialized; real spending remains BLOCKED until historical spending is reconciled and controls are reviewed. No income or payment is claimed.
+- Code commits: `154f01e4e162b05bab67947e3e18a81e5cd0b74c` (USD controls), `b2466e4430aec4dc68ad8d8aa5ca359d20032386` (tests), `0f7371c3fb3851d03678031eac26e45f2b1128b8` (CI workflow). Test results must be checked in GitHub Actions before describing the change as passing.
