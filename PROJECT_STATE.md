@@ -95,3 +95,11 @@ No suitable real purchase, marketplace account, publishing channel, or outreach 
 
 - A failed patch attempt left the working test and shortlist files containing only zero bytes. The test file was restored from its committed baseline, the CSRF regression test was reapplied, and refreshed market evidence was saved in a separate report. Inspection before restoration showed only the just-added test diff, so no pre-existing test changes were lost.
 - Focused private-console tests passed 18/18 and full regression passed 64/64 after recovery. No product code changed. Detailed market evidence is in reports/current-paid-work-refresh-2026-10-20-1448-utc.md.
+
+
+## Spending authorization update — 2026-10-24
+
+- Owner authorization now sets a **US$1,000 cumulative lifetime APIP project spending cap**, superseding the earlier NGN 10,000 ceiling. This is a maximum authorization, not evidence of available funds.
+- **Actual remaining balance: UNKNOWN. Real spending: BLOCKED.** Cumulative opening spend has not been independently reconciled, and the expense controls have not yet been updated and validated for the new currency-aware cap.
+- Before real spending can be enabled, implement and test fail-closed opening-balance evidence, USD-equivalent cap enforcement, transaction-reference deduplication, and reliable conversion-rate evidence for non-USD expenses. If any prerequisite is absent, reject the spend attempt.
+- This documentation update did not initiate a purchase, payment, subscription, external message, publication, or contract. No income is implied by the authorization.
