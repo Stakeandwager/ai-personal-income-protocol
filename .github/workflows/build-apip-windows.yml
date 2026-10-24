@@ -1,0 +1,49 @@
+name: Build APIP Windows executable
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/apip-windows-desktop
+    paths:
+      - "desktop/**"
+      - ".github/workflows/build-apip-windows.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build dependency
+        run: python -m pip install -r desktop/requirements-build.txt
+
+      - name: Compile-check application
+        run: python -m py_compile desktop/apip_desktop.py
+
+      - name: Build executable
+        run: python -m PyInstaller --noconfirm --clean --windowed --name APIP --onefile desktop/apip_desktop.py
+
+      - name: Verify executable exists
+        shell: pwsh
+        run: |
+          if (!(Test-Path "dist/APIP.exe")) { throw "dist/APIP.exe was not produced" }
+          Get-Item "dist/APIP.exe" | Select-Object Name,Length
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: APIP-Windows-exe
+          path: dist/APIP.exe
+          if-no-files-found: error
+          retention-days: 14
