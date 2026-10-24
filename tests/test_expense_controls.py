@@ -15,16 +15,24 @@ from scripts.expense_controls import (
 
 
 class ExpenseControlTests(unittest.TestCase):
+    """Tests use temporary databases and simulated evidence; no money moves."""
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.path = Path(self.temp.name) / "expenses.sqlite3"
         self.ledger = ExpenseLedger.initialize(
-            self.path, opening_spend_ngn="10.00", opening_evidence="SIMULATED OPENING BALANCE",
-            authorized_limit_ngn="100.00",
+            self.path, opening_spend_usd="10.00", opening_evidence="SIMULATED OPENING BALANCE",
+            authorized_limit_usd="100.00",
         )
 
     def tearDown(self):
         self.temp.cleanup()
+
+    def test_owner_authorization_is_hard_capped_at_usd_1000(self):
+        other = Path(self.temp.name) / "over-owner-cap.sqlite3"
+        with self.assertRaises(ExpenseError):
+            ExpenseLedger.initialize(other, opening_spend_usd="0", opening_evidence="SIM",
+                                     authorized_limit_usd="1000.01")
+        self.assertFalse(other.exists())
 
     def test_missing_ledger_fails_closed_until_opening_balance_is_evidenced(self):
         path = Path(self.temp.name) / "missing.sqlite3"
@@ -115,11 +123,11 @@ class ExpenseControlTests(unittest.TestCase):
 
     def test_initialization_never_overwrites_existing_file_or_exceeds_cap(self):
         with self.assertRaises(LedgerUnavailable):
-            ExpenseLedger.initialize(self.path, opening_spend_ngn="0", opening_evidence="SIM")
+            ExpenseLedger.initialize(self.path, opening_spend_usd="0", opening_evidence="SIM")
         other = Path(self.temp.name) / "over-cap.sqlite3"
         with self.assertRaises(ExpenseError):
-            ExpenseLedger.initialize(other, opening_spend_ngn="0", opening_evidence="SIM",
-                                      authorized_limit_ngn="10000.01")
+            ExpenseLedger.initialize(other, opening_spend_usd="0", opening_evidence="SIM",
+                                      authorized_limit_usd="1000.01")
         self.assertFalse(other.exists())
 
 

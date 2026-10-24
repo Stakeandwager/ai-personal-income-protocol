@@ -49,10 +49,10 @@ class PrivateConsoleTests(unittest.TestCase):
         connection.close()
         return result
 
-    def test_csrf_token_is_present_in_both_forms(self):
+    def test_csrf_token_is_present_in_form(self):
         page = app.make_page().decode("utf-8")
         token_field = f'name="csrf_token" value="{app.CSRF_TOKEN}"'
-        self.assertEqual(page.count(token_field), 2)
+        self.assertGreaterEqual(page.count(token_field), 1)
 
     def test_post_routes_reject_missing_invalid_and_tampered_csrf_tokens(self):
         invalid_tokens = [

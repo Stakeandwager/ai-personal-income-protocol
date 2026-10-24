@@ -21,9 +21,9 @@ The script writes a cleaned CSV, an exceptions CSV, and a field-mapping guide. I
 
 ## Proposed paid scope
 
-Clean up to 100 client-supplied CSV rows for **US$20 fixed price**, matching the budget shown on the indexed Zoho CRM cleanup brief described in the current run report. Confirm the target schema, mappings, duplicate key, and email/phone formatting before processing. Return the cleaned CSV, an exceptions log, and a mapping guide. Delivery estimate: within 24 hours after receiving a usable file and agreed field rules (estimated 1–2 hours of work). One clarification/revision pass. No contact enrichment, guessing, formula repair, or changes to the client's source file.
+Clean up to 100 client-supplied rows in one **CSV file for US$10 fixed price**. Confirm the target columns, deduplication key, and any optional email/phone formatting before processing. Return the cleaned CSV, an exceptions log, and a brief quality note. Delivery target: within 24 hours after receiving a usable file, agreeing the rules, and confirming the fixed-price milestone is funded. One clarification/revision pass within the original scope. No contact enrichment, guessing, web scraping, formula repair, native Excel workbook editing, or changes to the client's source file.
 
-The price follows one indexed Upwork listing that displayed a US$20 fixed-price budget; it is a proposed test price, not a market average, accepted quote, or guaranteed sale. Upwork service fees and proposal Connects apply as shown by Upwork at the time. No bid has been sent.
+This is a proposed introductory price for one bounded offer, not a market average, accepted quote, or guaranteed sale. Platform fees and proposal Connects may apply. The current target listing and a proposal draft are documented in `offers/spreadsheet-cleanup-buyer-ready-offer-2026-10-24.md`. The listing's status and account eligibility must be confirmed by an authorized freelancer account before submission. No bid has been sent.
 
 ## Safety and truth rules
 

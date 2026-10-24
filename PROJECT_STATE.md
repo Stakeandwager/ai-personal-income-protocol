@@ -3,6 +3,15 @@
 ## Project
 AI Personal Income Protocol (APIP)
 
+## Current governing status — 2026-10-24
+
+- **Delivery principle:** continue autonomous engineering, testing, debugging, and evidence-backed opportunity research within the defined safeguards. Safeguards should prevent unsafe or unsupported actions, not prevent ordinary validated software work.
+- **Spending authorization:** the owner's US$1,000 cumulative lifetime APIP project cap supersedes the earlier NGN 10,000 cap. This is an authorization ceiling, not evidence of funds available.
+- **Real spending remains BLOCKED.** Historical cumulative spend has not been independently reconciled, so the actual remaining balance is UNKNOWN. The live expense ledger is not initialized.
+- **USD controls are implemented on the draft feature branch** `feat/apip-usd-spending-controls`; PR #2 remains a draft and has not been merged. Green CI is evidence that the tested suite passed, not proof that all financial controls are production-ready.
+- Non-USD expenses and FX conversion are unsupported by this increment. No payment integration or money movement was added. No verified income is established by these changes.
+- Preserve historical dated entries below as records of what was known at that time. Where an earlier statement conflicts with the current authorization, this section and the dated 2026-10-24 addenda govern the current state.
+
 ## Verified environment
 - Windows, Python 3.13.5, Git installed.
 - Local repository: `C:\Users\Owner\Projects\ai-personal-income-protocol`.
@@ -20,7 +29,7 @@ AI Personal Income Protocol (APIP)
 - This run: NGN 0 spend; NGN 0 gross receipts recorded; NGN 0 fees/costs recorded; NGN 0 net receipts recorded. The income ledger has no run receipt. Historical receipts, cumulative opening spend, remaining spending authorization, and actual daily target attainment are not independently reconciled. No paid API use.
 - Next owner action: check the Upwork lead from an eligible account, confirm it is open, review exact Connects/fees, and only act if no unsupported spend is required. For the tournament, owner must confirm eligibility and use their own Devpost account and accept the rules. No income is guaranteed.
 
-## Capability audit — 2026-10-20
+## Capability audit — 2026-10-20 (historical snapshot; see current governing status above)
 
 | Capability | Status | Evidence / exact blocker |
 |---|---|---|
@@ -103,3 +112,12 @@ No suitable real purchase, marketplace account, publishing channel, or outreach 
 - **Actual remaining balance: UNKNOWN. Real spending: BLOCKED.** Cumulative opening spend has not been independently reconciled, and the expense controls have not yet been updated and validated for the new currency-aware cap.
 - Before real spending can be enabled, implement and test fail-closed opening-balance evidence, USD-equivalent cap enforcement, transaction-reference deduplication, and reliable conversion-rate evidence for non-USD expenses. If any prerequisite is absent, reject the spend attempt.
 - This documentation update did not initiate a purchase, payment, subscription, external message, publication, or contract. No income is implied by the authorization.
+
+
+## USD spending-controls implementation — 2026-10-24
+
+- Implemented on branch `feat/apip-usd-spending-controls`: expense ledger version 2 stores amounts as USD cents and enforces the hard US$1,000 cumulative lifetime cap in code. New ledgers must use the renamed USD arguments. Version-1 ledgers are rejected rather than silently migrated or reinterpreted.
+- Deliberate limitation: non-USD expenses and foreign-exchange conversion are **not supported** by this increment. Do not convert NGN amounts mentally or enter an approximate USD equivalent. Add evidenced exchange-rate source/date and tested conversion before allowing non-USD spending.
+- Added a GitHub Actions test workflow for pushes to this branch and pull requests. Tests use temporary databases and simulated evidence only; they do not authorize or execute payments.
+- Actual opening spend and remaining authorized balance remain UNKNOWN. The live private ledger is not initialized; real spending remains BLOCKED until historical spending is reconciled and controls are reviewed. No income or payment is claimed.
+- Code commits: `154f01e4e162b05bab67947e3e18a81e5cd0b74c` (USD controls), `b2466e4430aec4dc68ad8d8aa5ca359d20032386` (tests), `0f7371c3fb3851d03678031eac26e45f2b1128b8` (CI workflow). Test results must be checked in GitHub Actions before describing the change as passing.

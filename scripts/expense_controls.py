@@ -1,4 +1,4 @@
-"""Local, fail-closed NGN expense accounting controls; no payment integration."""
+"""Local, fail-closed USD expense accounting controls; no payment integration or FX conversion."""
 from __future__ import annotations
 
 import sqlite3
@@ -8,8 +8,8 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
-AUTHORIZED_LIMIT_MINOR = 1_000_000  # NGN 10,000.00
-LEDGER_VERSION = "1"
+AUTHORIZED_LIMIT_MINOR = 100_000  # USD 1,000.00, stored as cents
+LEDGER_VERSION = "2"
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LEDGER_PATH = ROOT / "data" / "private-spending" / "expenses.sqlite3"
 
@@ -32,14 +32,14 @@ class DuplicateTransaction(ExpenseError):
 
 def _minor_units(amount: Decimal | str | int) -> int:
     if isinstance(amount, float):
-        raise ExpenseError("Floating-point amounts are not accepted; use Decimal, string, or integer NGN.")
+        raise ExpenseError("Floating-point amounts are not accepted; use Decimal, string, or integer USD.")
     try:
         value = Decimal(str(amount))
         if not value.is_finite() or value <= 0:
-            raise ExpenseError("Amount must be a positive NGN amount.")
+            raise ExpenseError("Amount must be a positive USD amount.")
         rounded = value.quantize(Decimal("0.01"))
     except (InvalidOperation, ValueError):
-        raise ExpenseError("Amount must be a valid positive NGN amount.") from None
+        raise ExpenseError("Amount must be a valid positive USD amount.") from None
     if rounded != value:
         raise ExpenseError("Amount must be positive and have at most two decimal places.")
     return int(value * 100)
@@ -68,16 +68,16 @@ class ExpenseLedger:
         return cls(DEFAULT_LEDGER_PATH)
 
     @staticmethod
-    def initialize(path: Path, *, opening_spend_ngn: Decimal | str | int, opening_evidence: str,
-                   authorized_limit_ngn: Decimal | str | int = Decimal("10000.00")) -> "ExpenseLedger":
-        """Create a new ledger only with an explicit, evidenced cumulative opening balance."""
+    def initialize(path: Path, *, opening_spend_usd: Decimal | str | int, opening_evidence: str,
+                   authorized_limit_usd: Decimal | str | int = Decimal("1000.00")) -> "ExpenseLedger":
+        """Create a new USD-only ledger with an evidenced cumulative opening balance. Non-USD conversion is deliberately unsupported."""
         path = Path(path)
         if path.exists():
             raise LedgerUnavailable("Ledger path already exists; it will not be overwritten.")
-        limit_minor = _minor_units(authorized_limit_ngn)
-        opening_minor = _minor_units(opening_spend_ngn) if Decimal(str(opening_spend_ngn)) != 0 else 0
+        limit_minor = _minor_units(authorized_limit_usd)
+        opening_minor = _minor_units(opening_spend_usd) if Decimal(str(opening_spend_usd)) != 0 else 0
         if limit_minor > AUTHORIZED_LIMIT_MINOR:
-            raise ExpenseError("Configured limit exceeds the owner's NGN 10,000 authorization.")
+            raise ExpenseError("Configured limit exceeds the owner's USD 1,000 lifetime authorization.")
         evidence = (opening_evidence or "").strip()
         if not evidence:
             raise ExpenseError("A source reference for the cumulative opening balance is required.")
@@ -169,8 +169,8 @@ class ExpenseLedger:
         db.execute("INSERT INTO expense_events(expense_id,event,evidence_ref,at_utc) VALUES(?,?,?,?)",
                    (expense_id, event, evidence_ref.strip(), _now()))
 
-    def propose(self, expense_id: str, amount_ngn: Decimal | str | int, *, description: str) -> None:
-        amount = _minor_units(amount_ngn)
+    def propose(self, expense_id: str, amount_usd: Decimal | str | int, *, description: str) -> None:
+        amount = _minor_units(amount_usd)
         if not expense_id.strip() or not description.strip():
             raise ExpenseError("Expense ID and description are required.")
         with closing(self._connect()) as db:
@@ -201,7 +201,7 @@ class ExpenseLedger:
                 opening = int(dict(db.execute("SELECT key,value FROM metadata"))["opening_spend_minor"])
                 reserved = db.execute("SELECT COALESCE(SUM(amount_minor),0) FROM expenses WHERE status IN ('ATTEMPTED','COMPLETED','VERIFIED')").fetchone()[0]
                 if opening + int(reserved) + int(row[0]) > self.limit_minor:
-                    raise BudgetExceeded("Attempt would exceed the remaining cumulative NGN authorization.")
+                    raise BudgetExceeded("Attempt would exceed the remaining cumulative USD authorization.")
                 now = _now()
                 db.execute("UPDATE expenses SET status='ATTEMPTED',transaction_ref=?,authorization_ref=?,updated_at_utc=? WHERE expense_id=?",
                            (transaction_ref.strip(), authorization_ref.strip(), now, expense_id))
