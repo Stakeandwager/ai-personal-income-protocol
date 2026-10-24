@@ -27,3 +27,12 @@ Add dated entries when the owner explicitly approves a change. Do not treat AI s
 
 ## Additional owner authorization — 2026-10-21
 - For project records and backup, APIP may commit and push run-scoped project changes at the existing two-hour automation interval, after tests and diff review. Stage only changes created by that run; preserve unrelated user changes and exclude secrets/private data. Push only with a normal fast-forward to the configured upstream; never force-push, merge, or modify production. If checks fail, unrelated changes are present, or push is not a fast-forward, stop and report instead of publishing.
+
+
+## Owner authorization — 2026-10-24 (supersedes prior spending ceiling)
+- Maximum cumulative APIP project spending authorization: **US$1,000 total**, including any previously incurred APIP costs. This replaces the earlier NGN 10,000 ceiling; it does not prove that funds are available or that the remaining balance is known.
+- Autonomous spending within the remaining, evidence-backed balance is authorized without per-expense approval only after the currency-aware hard-stop controls are implemented and validated, and cumulative prior spend/opening balance is independently evidenced. Until both conditions are met, real spending remains blocked.
+- Permitted scope: lawful, necessary, one-off APIP project expenses that directly support a documented experiment or delivery. No borrowing, gambling/betting, speculative trading, deceptive activity, or spending on unrelated personal purposes.
+- No recurring auto-renew subscriptions, debt, or commitments whose total potential liability can exceed the cap. No external contract, public commitment, account creation, outbound message, purchase, or money movement beyond this scoped spending authorization; each remains subject to its separate applicable approval gate.
+- Currency handling must be conservative: record transaction currency and reliable conversion-rate evidence for the ledger's USD-equivalent cap. If conversion evidence or the opening balance is missing, the hard stop must fail closed. Do not initiate a transaction merely to test the controls.
+- This authorization changes policy only; it does not initiate a purchase, payment, subscription, or other external action.
