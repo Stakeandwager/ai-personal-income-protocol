@@ -61,3 +61,19 @@
 - No product code changed; this run verifies the existing CSRF guard. Market evidence refresh is recorded in `reports/current-paid-work-refresh-2026-10-20-1448-utc.md`; no external action, paid API call, purchase, or payment occurred.
 
 - Re-run after restoring the test file from the committed baseline on 2026-10-21: focused console suite PASS (18 tests); full suite PASS (64 tests).
+
+## 2026-10-21 — local CSV cleanup deliverable
+- Initial focused run: FAIL — one new assertion expected the wrong list of columns in a case-folded duplicate-key conflict. The test expectation was corrected; no product-code defect was identified.
+- Demo command exercised with five fictional CSV records. Result: 1 kept, 4 exception rows, 1 exact duplicate removed; the input file remained unchanged. Generated outputs were refreshed to use the duplicate_exact_after_trim reason.
+- Focused command: python -m unittest tests.test_spreadsheet_cleanup -v — PASS, 7 tests.
+- Full regression command: python -m unittest discover -s tests -v — PASS, 71 tests.
+- Coverage includes agreed-key duplicate handling, conflicts and missing keys, exact repeat behavior, UTF-8/CSV quoting, input preservation, output overwrite protection, and row-count limits. No customer data, external account, proposal, tournament entry, purchase, paid API, or payment was used.
+
+## 2026-10-21 — buyer-specific CSV mapping and format follow-up
+
+- Focused command: `python -m unittest tests.test_spreadsheet_cleanup -v` — PASS, 11 tests.
+- Full regression command: `python -m unittest discover -s tests -v` — PASS, 75 tests.
+- CLI check: `python scripts/spreadsheet_cleanup.py --help` — PASS; the help output includes explicit email/phone formatting, target fields, and buyer-confirmed mapping options.
+- Demo command rerun with synthetic records — PASS: five input rows produced one kept row, four exceptions, one exact duplicate removal, and a mapping guide. The root preview CSVs were refreshed from the same generated outputs.
+- Added coverage for preserving email local-part case, conservative phone separator cleanup, malformed-value quarantine without partial rewrites, format-column validation, proposed/missing CRM mappings, and invalid mapping rejection.
+- No customer data, external account, proposal, tournament entry, purchase, paid API, delivery, or payment was involved.

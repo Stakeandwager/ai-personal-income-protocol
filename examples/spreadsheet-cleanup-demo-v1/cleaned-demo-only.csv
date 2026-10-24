@@ -1,3 +1,2 @@
-company,contact_name,email,phone,city,source_note
-Blue River Books,Alex Example,alex@example.invalid,555-0102,Ibadan,fictional demo row
-Unknown Store,,,,,fictional incomplete row
+﻿company,contact_name,email,phone,city
+BLUE RIVER BOOKS,Alex Example,alex@example.invalid,5550102,Ibadan

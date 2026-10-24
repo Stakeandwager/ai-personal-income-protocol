@@ -1,3 +1,5 @@
-company,reason,action
-Northstar Bakery,Conflicting phone values across otherwise matching rows,Withheld from cleaned output pending client confirmation
-Unknown Store,Contact name email phone and city are missing,Retained company label only; no values inferred
+﻿_apip_source_record,_apip_issue,company,contact_name,email,phone,city
+2,"conflicting_key_values:company,contact_name,email,phone,city",NORTHSTAR BAKERY,jamie sample,JAMIE@example.invalid,5550100101,LAGOS
+3,"conflicting_key_values:company,contact_name,email,phone,city",Northstar Bakery,Jamie Sample,jamie@example.invalid,5550101,Lagos
+5,duplicate_exact_after_trim,BLUE RIVER BOOKS,Alex Example,alex@example.invalid,5550102,Ibadan
+6,invalid_phone_format:phone,UNKNOWN STORE,,,not provided,

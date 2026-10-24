@@ -1,0 +1,6 @@
+﻿source_column,target_field,handling,mapping_status
+company,Account_Name,Trim outer whitespace only; preserve other values,proposed mapping; buyer confirmation required
+contact_name,Contact_Name,Trim outer whitespace only; preserve other values,proposed mapping; buyer confirmation required
+email,Email,Trim; lowercase domain only; preserve local part; malformed values go to review,proposed mapping; buyer confirmation required
+phone,Phone,Trim; remove visual separators; preserve digits and leading +; no country-code inference,proposed mapping; buyer confirmation required
+city,City,Trim outer whitespace only; preserve other values,proposed mapping; buyer confirmation required

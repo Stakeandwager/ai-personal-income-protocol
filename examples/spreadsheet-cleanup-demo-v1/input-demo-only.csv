@@ -1,6 +1,6 @@
-company,contact_name,email,phone,city,source_note
-  NORTHSTAR BAKERY ,jamie sample,JAMIE@EXAMPLE.INVALID,(555) 010-0101,  LAGOS ,fictional demo row
-Northstar Bakery,Jamie Sample,jamie@example.invalid,555-0101,Lagos,fictional duplicate with conflicting phone
-BLUE RIVER BOOKS,Alex Example,alex@example.invalid,555-0102,Ibadan,fictional demo row
-Blue River Books , Alex Example , alex@example.invalid ,555-0102, IBADAN ,fictional exact duplicate after normalization
-UNKNOWN STORE,,,not provided,,fictional incomplete row
+company,contact_name,email,phone,city
+  NORTHSTAR BAKERY ,jamie sample,JAMIE@EXAMPLE.INVALID,(555) 010-0101,"  LAGOS "
+Northstar Bakery,Jamie Sample,jamie@example.invalid,555-0101,Lagos
+BLUE RIVER BOOKS,Alex Example,alex@example.invalid,555-0102,Ibadan
+ BLUE RIVER BOOKS , Alex Example , alex@example.invalid ,555-0102," Ibadan "
+UNKNOWN STORE,,,not provided,

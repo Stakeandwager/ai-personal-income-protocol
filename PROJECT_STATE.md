@@ -8,6 +8,18 @@ AI Personal Income Protocol (APIP)
 - Local repository: `C:\Users\Owner\Projects\ai-personal-income-protocol`.
 - Branch `main` tracks `origin/main`; working tree contains substantial pre-existing user changes. Preserve them.
 
+## 72-hour first-revenue pursuit — 2026-10-21
+
+- Status: active. Current run deadline is 2026-10-24 12:08:20 UTC. Run ID and evidence: reports/apip-72h-income-pursuit-2026-10-21.md.
+- Local deliverable: a synthetic-data-tested CSV cleanup utility and exception-log demo; no client file or real customer data was processed.
+- Best public lead: a US$20 Upwork brief for a 100-contact CRM CSV cleanup. The local sample now includes conservative opt-in email/phone formatting and a mapping guide. Search metadata shows worldwide eligibility, 20–50 proposals, one hire, and buyer activity, but direct access returns 403, publication metadata conflicts, and the open status/account eligibility are unconfirmed. No Upwork account is connected.
+- Agriculture lead: a Kano SAPZ digital climate-services/value-chain consultancy for 12,000 farmers appears in two public tender reproductions with an eight-week timeline and a Nov 4 deadline. No official primary notice was found, one aggregator shows a conflicting date, budget/payment terms are missing, and the donor-funded agricultural experience is not demonstrated. It is not an APIP-fit application on known facts.
+- Tournament leads: free Devpost Build With AI: Basics ends Oct 26 but owner eligibility/account remain unverified. HackCache is online and allows solo entrants, but its organizer page shows a non-refundable ₹600 fee and conflicting Oct 20/21 registration dates; no expense evidence/payment capability is connected and the prize payout occurs after the event. No tournament entry occurred.
+- GTBank: current Upwork help lists Guaranty Trust Bank (code 058) for local bank payout. For fixed-price work, the client may review for up to 14 days and Upwork then applies a five-day security hold; a new bank method has a separate three-day activation and bank transfer may take up to four days. Holds may overlap, so exact timing varies. No payout method is connected/configured and no bank details were accessed. A 72-hour verified-cash ETA is not plausible on a new fixed-price account setup.
+- One-off customer-discovery/marketing experiment: NOT RESERVED; no suitable connected APIP-owned marketplace, publication, or outreach account. No proposal, message, publication, tournament entry, or contract occurred.
+- This run: NGN 0 spend; NGN 0 gross receipts recorded; NGN 0 fees/costs recorded; NGN 0 net receipts recorded. The income ledger has no run receipt. Historical receipts, cumulative opening spend, remaining spending authorization, and actual daily target attainment are not independently reconciled. No paid API use.
+- Next owner action: check the Upwork lead from an eligible account, confirm it is open, review exact Connects/fees, and only act if no unsupported spend is required. For the tournament, owner must confirm eligibility and use their own Devpost account and accept the rules. No income is guaranteed.
+
 ## Capability audit — 2026-10-20
 
 | Capability | Status | Evidence / exact blocker |
@@ -50,6 +62,14 @@ No suitable real purchase, marketplace account, publishing channel, or outreach 
 - Existing local ledger validator, deterministic opportunity generator/cycle, loopback-only private console, offline-first planner, and local JSONL records remain available.
 - No verified income recorded. No paid API call, actual purchase, publication, customer outreach, or money movement occurred in this session.
 - The GitHub Actions workflow still grants `contents: write` and pushes generated reports; behavior and permissions remain unverified.
+
+## Autonomous pursuit update — 2026-10-21 12:41 UTC
+
+- Acquired and held exclusive run lease `gns9pmOCIxaB7p8HxOOZJNtbygUamNRd` for this continuation. No commit, push, merge, production change, marketplace action, external message, publication, purchase, or payment.
+- Improved the local CSV deliverable to produce a buyer-reviewable field-mapping guide and optional conservative email/phone formatting. The demo was rerun on synthetic data. Details and current sourced leads are in `reports/apip-72h-income-pursuit-update-2026-10-21-1231-utc.md`.
+- Verification: 11 focused CSV tests passed; the full regression passed 75 tests; CLI help completed successfully; the synthetic demo was rerun and generated cleaned, exceptions, and mapping-guide outputs. Results are in `TEST_RESULTS.md`.
+- Current recorded amounts: NGN 0 gross receipts, NGN 0 fees/costs, NGN 0 net receipts for this run; no independent bank reconciliation. Historical receipts and cumulative opening spend remain unverified. The NGN 10,000/day target remains unachieved in project records, not a forecast.
+- One-off experiment remains NOT RESERVED. No connected APIP-owned marketplace or event/publishing account is available. No client contact, public contest submission, or customer-data processing is claimed.
 
 ## Tests and next action
 - Baseline: `python -m unittest discover -s tests -v` — 31 passed.

@@ -1,5 +1,12 @@
 # APIP Task Queue
 
+## Priority 0 — 72-hour first-revenue pursuit (active to 2026-10-24 12:08 UTC)
+- [x] Build and exercise a local CSV cleanup deliverable with fictional input, cleaned output, auditable exceptions log, conservative opt-in email/phone rules, and a buyer-reviewable field-mapping guide.
+- [x] Independently refresh public paid-work and tournament leads; record claims, buyer activity/budget, eligibility, estimates, payment routes, costs, and risks in reports/apip-72h-income-pursuit-2026-10-21.md and reports/apip-72h-income-pursuit-update-2026-10-21-1231-utc.md.
+- [ ] Owner checks the US$20 Upwork CRM cleanup lead in an eligible account, confirms it is open, and reviews the exact Connects/fee before any proposal. No new spend without an evidenced opening ledger and valid authorization.
+- [ ] Owner checks whether the Devpost or HackCache entry route is personally eligible and uses their own account. HackCache's ₹600 non-refundable fee cannot be paid until the cumulative expense opening balance, live ledger, and payment capability are established; no tournament entry has occurred. A prize is not a 72-hour income plan.
+- [ ] Record any future gross receipts, fees/costs, and net receipts separately, with independent payment evidence; keep the NGN 10,000/day target as a measured result, not a forecast.
+
 ## Priority 1 — Verify unattended execution and secure state transitions
 - [ ] Observe a scheduled two-hour Codex automation run perform current public opportunity discovery, preserve source evidence, and record its run history; configuration is confirmed, discovery execution is not yet verified.
 - [ ] Enforce explicit console outcome transitions and reject duplicate or contradictory terminal outcomes.
@@ -20,6 +27,7 @@
 - [ ] Validate the complete income-ledger status and date domains.
 - [ ] Validate opportunity sources, eligibility, effort, risk, and reward before prioritization.
 - [x] Create a synthetic sample deliverable for the source-backed spreadsheet-cleanup offer; do not treat it as customer demand or income.
+- [x] Add explicit CSV email/phone formatting and CRM field-mapping outputs grounded in the indexed buyer brief; require buyer approval for formats and field mapping.
 - [ ] Add a guarded marketplace proposal/outreach adapter only after a suitable account is connected; require authorized channel, scoped recipient, privacy/opt-out rules, and evidence logging. Never log credentials or private financial data.
 - [ ] Track the owner's NGN 10,000/day target using independently evidenced net receipts; never use it as a forecast or daily spending limit.
 
