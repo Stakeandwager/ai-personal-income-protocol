@@ -50,7 +50,11 @@ class PrivateConsoleTests(unittest.TestCase):
         return result
 
     def test_csrf_token_is_present_in_both_forms(self):
-        page = app.make_page().decode("utf-8")
+        # The page has a plan-creation form and an outcome form only when a
+        # non-terminal saved plan is present. Supply that state explicitly.
+        sample_plan = {"plan_id": "p-csrf", "status": "DRAFT", "plan": "Test plan", "workflow": {}}
+        with patch.object(app, "read_plans", return_value=[sample_plan]), patch.object(app, "read_jsonl", return_value=[]):
+            page = app.make_page().decode("utf-8")
         token_field = f'name="csrf_token" value="{app.CSRF_TOKEN}"'
         self.assertEqual(page.count(token_field), 2)
 

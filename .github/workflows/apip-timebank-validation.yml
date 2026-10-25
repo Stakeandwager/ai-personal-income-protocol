@@ -1,0 +1,57 @@
+name: APIP TimeBank validation
+
+on:
+  push:
+    branches: [feat/apip-timebank-economic-engine]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  timebank:
+    name: TimeBank focused tests and package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Set up Node.js for extension syntax checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run TimeBank automated tests
+        run: python -m unittest discover -s tests -p 'test_timebank_*.py' -v
+      - name: Validate extension manifest JSON
+        run: python -m json.tool browser-extension/timebank/manifest.json > /dev/null
+      - name: Check extension JavaScript syntax
+        run: |
+          node --check browser-extension/timebank/popup.js
+          node --check browser-extension/timebank/service-worker.js
+      - name: Package installable extension
+        run: zip -j APIP_TimeBank_Extension_v0.1.0.zip browser-extension/timebank/manifest.json browser-extension/timebank/popup.html browser-extension/timebank/popup.css browser-extension/timebank/popup.js browser-extension/timebank/service-worker.js
+      - name: Upload extension ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: APIP_TimeBank_Extension_v0.1.0
+          path: APIP_TimeBank_Extension_v0.1.0.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  repository-regression:
+    name: Existing repository regression suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Run full repository test suite
+        run: python -m unittest discover -s tests -v
