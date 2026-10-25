@@ -20,6 +20,8 @@
 - Economic engine and local Manifest V3 extension committed to this feature branch.
 - TimeBank-focused CI checks: 13 tests passed; manifest JSON and both JavaScript syntax checks passed; extension ZIP packaged and uploaded as artifact 12604813976.
 - A copy of the artifact was downloaded and its inner extension ZIP integrity was verified locally.
-- Full repository suite previously ran 77 tests and failed two tests. The proportional example and CSRF test fixture have since been corrected; a full regression rerun is still required.
+- Full repository regression suite: PASS — 77 tests passed in GitHub Actions run 40209499723 after correcting the proportional example and CSRF test fixture. TimeBank-focused suite: PASS — 13 tests. See docs/APIP_TIMEBANK_TEST_REPORT.md.
 - Real Chromium manual installation: not yet performed.
 - Draft PR: https://github.com/Stakeandwager/ai-personal-income-protocol/pull/3 — not merged.
+
+- Latest test report commit: 6174a3b3716817828e1eae3f2f29367692aacde1 (documentation update after the successful run).
