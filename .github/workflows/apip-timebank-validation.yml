@@ -34,8 +34,7 @@ jobs:
           node --check browser-extension/timebank/service-worker.js
       - name: Package installable extension
         run: |
-          cd browser-extension/timebank
-          zip -r ../../../../APIP_TimeBank_Extension_v0.1.0.zip manifest.json popup.html popup.css popup.js service-worker.js
+          zip -j APIP_TimeBank_Extension_v0.1.0.zip browser-extension/timebank/manifest.json browser-extension/timebank/popup.html browser-extension/timebank/popup.css browser-extension/timebank/popup.js browser-extension/timebank/service-worker.js
       - name: Upload extension ZIP artifact
         uses: actions/upload-artifact@v4
         with:
