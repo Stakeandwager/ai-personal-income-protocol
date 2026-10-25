@@ -32,3 +32,14 @@ jobs:
         run: |
           node --check browser-extension/timebank/popup.js
           node --check browser-extension/timebank/service-worker.js
+      - name: Package installable extension
+        run: |
+          cd browser-extension/timebank
+          zip -r ../../../../APIP_TimeBank_Extension_v0.1.0.zip manifest.json popup.html popup.css popup.js service-worker.js
+      - name: Upload extension ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: APIP_TimeBank_Extension_v0.1.0
+          path: APIP_TimeBank_Extension_v0.1.0.zip
+          if-no-files-found: error
+          retention-days: 14
