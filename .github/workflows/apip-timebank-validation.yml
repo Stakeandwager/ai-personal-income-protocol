@@ -1,0 +1,34 @@
+name: APIP TimeBank validation
+
+on:
+  push:
+    branches: [feat/apip-timebank-economic-engine]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Set up Node.js for extension syntax checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run repository test suite
+        run: python -m unittest discover -s tests -v
+      - name: Validate extension manifest JSON
+        run: python -m json.tool browser-extension/timebank/manifest.json > /dev/null
+      - name: Check extension JavaScript syntax
+        run: |
+          node --check browser-extension/timebank/popup.js
+          node --check browser-extension/timebank/service-worker.js
