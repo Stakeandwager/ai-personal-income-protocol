@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>APIP TimeBank</title><link rel="stylesheet" href="popup.css"></head>
+<body><main><header><h1>APIP TimeBank</h1><p class="sub">Local activity timer · MVP 0.1.0</p></header>
+<p class="notice">Free extension. Timing records elapsed activity only; it does not prove attention or guarantee earnings. Payments are not enabled.</p>
+<label for="activity">Activity / website label</label><input id="activity" maxlength="120" placeholder="e.g. approved research session">
+<label class="consent"><input id="consent" type="checkbox"> I approve recording this activity locally on this device.</label>
+<div class="timer" id="timer">00:00:00</div><p id="state" role="status">No active session</p>
+<div class="actions"><button id="start">Start session</button><button id="stop" disabled>Stop and save</button></div>
+<section><div class="section-head"><h2>Local history</h2><span id="count">0 records</span></div><div class="actions"><button id="export">Export CSV</button><button id="delete" class="danger">Delete history</button></div><ul id="history"></ul></section>
+<footer>Copyright © 2026 StakeandWager.com. All rights reserved.<br>Intended IP ownership is subject to legal verification and third-party rights.</footer></main><script src="popup.js"></script></body></html>
