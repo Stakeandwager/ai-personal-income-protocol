@@ -43,11 +43,11 @@ def distributable_pool(funding: Iterable[FundingEntry], deductions: Iterable[Ded
     seen: set[str] = set()
     total = 0
     for entry in funding:
-        if entry.currency.upper() != cur:
-            continue
         if not entry.entry_id or entry.entry_id in seen:
             raise ValueError(f"duplicate or empty funding ID: {entry.entry_id!r}")
         seen.add(entry.entry_id)
+        if entry.currency.upper() != cur:
+            continue
         if entry.amount_minor < 0 or entry.allocated_to_rewards_minor < 0:
             raise ValueError("funding amounts must be non-negative")
         if entry.allocated_to_rewards_minor > entry.amount_minor:
