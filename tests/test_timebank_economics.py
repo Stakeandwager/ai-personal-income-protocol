@@ -29,6 +29,10 @@ class EconomicEngineTests(unittest.TestCase):
         entries = [FundingEntry("same", "NGN", 100, "VERIFIED", 100), FundingEntry("same", "NGN", 100, "VERIFIED", 100)]
         with self.assertRaises(ValueError): distributable_pool(entries, [], "NGN")
 
+    def test_duplicate_funding_id_rejected_across_currencies(self):
+        entries = [FundingEntry("same", "NGN", 100, "VERIFIED", 100), FundingEntry("same", "EUR", 100, "VERIFIED", 100)]
+        with self.assertRaises(ValueError): distributable_pool(entries, [], "NGN")
+
     def test_allocations_never_exceed_pool_and_round_deterministically(self):
         first = allocate_rewards(10, "NGN", {"b": 1, "a": 1, "c": 1})
         second = allocate_rewards(10, "NGN", {"c": 1, "b": 1, "a": 1})
