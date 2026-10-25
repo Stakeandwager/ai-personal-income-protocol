@@ -14,7 +14,7 @@ class EconomicEngineTests(unittest.TestCase):
 
     def test_proportional_allocation_example(self):
         result = allocate_rewards(80000, "EUR", {"a": 100, "b": 200, "c": 500})
-        self.assertEqual({x.subscriber_id: x.amount_minor for x in result}, {"a": 8000, "b": 16000, "c": 56000})
+        self.assertEqual({x.subscriber_id: x.amount_minor for x in result}, {"a": 10000, "b": 20000, "c": 50000})
         self.assertEqual(sum(x.amount_minor for x in result), 80000)
 
     def test_zero_pool_and_zero_points(self):
